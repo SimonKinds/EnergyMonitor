@@ -1,14 +1,13 @@
-## This is the project Energy Monitoring program compatible the ODROID-XU4.
-### How to build the Energy Monitor Qt application.
+# Build
+```sh
+mkdir build
+cd build
+cmake ..
+make
+```
 
-#### Install packages and clone the source code.
+# Run
+```sh
+./energy-monitor
+```
 
-```
-# sudo apt-get install qt4-default libqwt-dev
-# git clone https://github.com/hardkernel/EnergyMonitor.git
-```
-#### Make!
-```
-# qmake-qt4
-# make -j8
-```
