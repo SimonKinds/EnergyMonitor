@@ -5,11 +5,15 @@
 #include "getnode.h"
 
 namespace {
-bool running = true;
-void signal_handler(int) { running = false; }
+bool start = true;
+bool stop = false;
+void signal_handler_start(int) { start = true; }
+void signal_handler_stop(int) { stop = true; }
 } // namespace
 
-int main() {
+int main(int argc, char **argv) {
+  start = argc < 2;
+
   GetNode nodes;
 
   if (nodes.OpenINA231() != 0) {
@@ -17,13 +21,17 @@ int main() {
     return 1;
   }
 
-  std::signal(SIGINT, signal_handler);
-  std::signal(SIGTERM, signal_handler);
-  std::signal(SIGHUP, signal_handler);
+  std::signal(SIGUSR1, signal_handler_start);
+  std::signal(SIGINT, signal_handler_stop);
+  std::signal(SIGTERM, signal_handler_stop);
+  std::signal(SIGHUP, signal_handler_stop);
+
+  while(!start){
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
 
   puts("a15-watt, a17-watt, gpu-watt, mem-watt\n");
-
-  while (running) {
+  while (start && !stop) {
     nodes.GetINA231();
 
     printf("%f, %f, %f, %f\n", nodes.armuW, nodes.kfcuW, nodes.g3duW,
